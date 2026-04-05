@@ -170,7 +170,7 @@ PHP 8.0+ and MySQL 8.0+ are required.
 
 ```bash
 # Clone via Git
-git clone https://github.com/yourusername/campusconnect.git
+git clone https://github.com/Saqib-Hussain-07/campusconnect.git
 
 # Or download the ZIP and extract
 ```
@@ -509,7 +509,7 @@ Contributions are welcome! Here's how to get started:
 ```bash
 # 1. Fork the repository
 # 2. Clone your fork
-git clone https://github.com/yourusername/campusconnect.git
+git clone https://github.com/Saqib-Hussain-07/campusconnect.git
 
 # 3. Create a feature branch
 git checkout -b feature/your-feature-name

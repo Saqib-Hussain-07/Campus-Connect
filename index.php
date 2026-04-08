@@ -31,6 +31,7 @@ include __DIR__ . '/includes/header.php';
      HERO
 =================================================== -->
 <section id="home" class="cc-hero">
+  
   <div class="row g-0">
 
     <!-- Left -->

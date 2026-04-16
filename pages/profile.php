@@ -290,10 +290,12 @@ include __DIR__ . '/../includes/header.php';
           <p style="font-size:.84rem;color:#888;margin-bottom:16px;">
             Deleting your account is permanent and cannot be undone. All your connections, groups and messages will be lost.
           </p>
-          <button type="button" class="btn btn-outline-danger btn-sm" style="border-radius:0;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;"
-                  onclick="if(confirm('Are you sure you want to delete your account? This cannot be undone.')) window.location='delete_account.php';">
-            Delete My Account
-          </button>
+          <form method="POST" action="delete_account.php" onsubmit="return confirm('Are you sure you want to delete your account? This cannot be undone.');">
+            <input type="hidden" name="csrf" value="<?= e($_SESSION['csrf']) ?>">
+            <button type="submit" class="btn btn-outline-danger btn-sm" style="border-radius:0;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">
+              Delete My Account
+            </button>
+          </form>
         </div>
       </div>
 

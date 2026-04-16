@@ -2,12 +2,28 @@
 // ============================================================
 //  includes/config.php  — Database connection & site config
 // ============================================================
-define('DB_HOST',     'localhost');
-define('DB_USER',     'root');
-define('DB_PASS',     '');          // change if your MySQL has a password
-define('DB_NAME',     'campusconnect');
-define('SITE_NAME',   'CampusConnect');
-define('SITE_URL',    'http://localhost/campusconnect');
+define('DB_HOST',       'localhost');
+define('DB_USER',       'root');
+define('DB_PASS',       '');          // change if your MySQL has a password
+define('DB_NAME',       'campusconnect');
+define('SITE_NAME',     'CampusConnect');
+define('SITE_URL',      'http://localhost/CampusConnect');
+
+// ── Mail config (update for production SMTP) ──────────────────
+define('MAIL_FROM',      'noreply@campusconnect.local');
+define('MAIL_FROM_NAME', 'CampusConnect');
+
+// ── Security headers ──────────────────────────────────────────
+if (!headers_sent()) {
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-Content-Type-Options: nosniff');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('X-XSS-Protection: 1; mode=block');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=()');
+}
+
+// ── Include mailer helper ─────────────────────────────────────
+require_once __DIR__ . '/mailer.php';
 
 // ── PDO connection ───────────────────────────────────────────
 function getDB(): PDO {
@@ -30,7 +46,18 @@ function getDB(): PDO {
 }
 
 // ── Session helpers ───────────────────────────────────────────
-session_start();
+// Harden session cookie
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.cookie_samesite', 'Lax');
+    session_start();
+    // Auto-initialize CSRF token so every page (including those only including
+    // header.php) has one available for forms like the footer newsletter.
+    if (empty($_SESSION['csrf'])) {
+        $_SESSION['csrf'] = bin2hex(random_bytes(32));
+    }
+}
 
 function isLoggedIn(): bool {
     return isset($_SESSION['user_id']);
@@ -119,6 +146,14 @@ function avatarUrl(array $user): string {
     }
     return 'https://picsum.photos/seed/' . urlencode($user['name']) . '/200/200';
 }
+
+// ── Ensure uploads directory exists ───────────────────────────
+(function () {
+    $dir = __DIR__ . '/../assets/uploads/avatars';
+    if (!is_dir($dir)) {
+        mkdir($dir, 0755, true);
+    }
+})();
 
 // ── Department → Course catalogue (used on register & profile) ───────────────
 define('DEPT_COURSES_PHP', [

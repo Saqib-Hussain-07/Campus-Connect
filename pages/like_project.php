@@ -17,5 +17,9 @@ if ($existing->fetch()) {
     $db->prepare('INSERT IGNORE INTO project_likes (project_id,user_id) VALUES (?,?)')->execute([$projId,$me]);
     $db->prepare('UPDATE projects SET likes=likes+1 WHERE id=?')->execute([$projId]);
 }
-$redirect = urldecode($_POST['redirect'] ?? SITE_URL.'/pages/projects.php');
-header('Location: '.$redirect); exit;
+// Validate redirect URL to prevent open redirect vulnerability
+$redirect = urldecode($_POST['redirect'] ?? '');
+if (!$redirect || strpos($redirect, SITE_URL) !== 0) {
+    $redirect = SITE_URL . '/pages/projects.php';
+}
+header('Location: ' . $redirect); exit;

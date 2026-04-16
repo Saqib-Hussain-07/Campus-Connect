@@ -17,12 +17,24 @@ if ($groupId < 1) {
 
 try {
     $db = getDB();
-    $db->prepare('INSERT IGNORE INTO group_members (group_id, user_id) VALUES (?,?)')->execute([$groupId, $me]);
-    setFlash('success','You have joined the group!');
+
+    // Check if already a member
+    $chk = $db->prepare('SELECT 1 FROM group_members WHERE group_id=? AND user_id=?');
+    $chk->execute([$groupId, $me]);
+    if ($chk->fetch()) {
+        setFlash('info', 'You are already a member of this group.');
+    } else {
+        $db->prepare('INSERT INTO group_members (group_id, user_id) VALUES (?,?)')->execute([$groupId, $me]);
+        setFlash('success','You have joined the group!');
+    }
 } catch (Exception $e) {
     setFlash('warning','Could not join group.');
 }
 
-$ref = $_SERVER['HTTP_REFERER'] ?? SITE_URL.'/pages/groups.php';
+// Validate referer to prevent open redirect
+$ref = $_SERVER['HTTP_REFERER'] ?? '';
+if (!$ref || strpos($ref, SITE_URL) !== 0) {
+    $ref = SITE_URL . '/pages/groups.php';
+}
 header('Location: ' . $ref);
 exit;

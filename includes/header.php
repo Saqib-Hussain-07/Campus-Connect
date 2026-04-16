@@ -106,17 +106,17 @@ if ($user) {
         <?php if ($user): ?>
           <a href="<?= SITE_URL ?>/pages/messages.php" class="cc-icon-btn position-relative" title="Messages">
             <i class="fas fa-comment-dots"></i>
-            <?php if ($msgBadge > 0): ?><span class="cc-badge"><?= $msgBadge > 9 ? '9+' : $msgBadge ?></span><?php endif; ?>
+            <?php if ($msgBadge > 0): ?><span class="cc-badge cc-msg-badge"><?= $msgBadge > 9 ? '9+' : $msgBadge ?></span><?php else: ?><span class="cc-badge cc-msg-badge" style="display:none;">0</span><?php endif; ?>
           </a>
           <div class="dropdown">
             <button class="cc-icon-btn position-relative" data-bs-toggle="dropdown" title="Notifications">
               <i class="fas fa-bell"></i>
-              <?php if ($notifCount > 0): ?><span class="cc-badge"><?= $notifCount > 9 ? '9+' : $notifCount ?></span><?php endif; ?>
+              <?php if ($notifCount > 0): ?><span class="cc-badge cc-notif-badge"><?= $notifCount > 9 ? '9+' : $notifCount ?></span><?php else: ?><span class="cc-badge cc-notif-badge" style="display:none;">0</span><?php endif; ?>
             </button>
             <div class="dropdown-menu cc-notif-menu dropdown-menu-end shadow-lg p-0" style="min-width:300px;max-width:340px;">
               <div class="cc-notif-header">
                 <span>Notifications</span>
-                <?php if ($notifCount > 0): ?><a href="<?= SITE_URL ?>/pages/mark_read.php" style="font-size:.62rem;color:var(--rust);font-family:var(--font-mono);">Mark all read</a><?php endif; ?>
+                <?php if ($notifCount > 0): ?><form method="POST" action="<?= SITE_URL ?>/pages/mark_read.php" style="display:inline;"><input type="hidden" name="csrf" value="<?= e($_SESSION['csrf']) ?>"><button type="submit" style="background:none;border:none;padding:0;font-size:.62rem;color:var(--rust);font-family:var(--font-mono);cursor:pointer;">Mark all read</button></form><?php endif; ?>
               </div>
               <?php
               try {
@@ -155,6 +155,8 @@ if ($user) {
               <li><a class="dropdown-item cc-dd-simple" href="<?= SITE_URL ?>/pages/profile.php"><i class="fas fa-user-pen me-2" style="color:var(--rust);width:16px;"></i>Edit Profile</a></li>
               <li><a class="dropdown-item cc-dd-simple" href="<?= SITE_URL ?>/pages/add_project.php"><i class="fas fa-plus-circle me-2" style="color:var(--rust);width:16px;"></i>Post Project</a></li>
               <li><a class="dropdown-item cc-dd-simple" href="<?= SITE_URL ?>/pages/messages.php"><i class="fas fa-comment-dots me-2" style="color:var(--rust);width:16px;"></i>Messages<?php if($msgBadge>0): ?> <span style="background:var(--rust);color:#fff;font-size:.58rem;padding:1px 5px;border-radius:8px;"><?= $msgBadge ?></span><?php endif; ?></a></li>
+              <li><hr class="dropdown-divider" style="border-color:var(--cream);"></li>
+              <li><a class="dropdown-item cc-dd-simple" href="<?= SITE_URL ?>/pages/admin.php"><i class="fas fa-gauge-high me-2" style="color:var(--sky);width:16px;"></i>Admin Panel</a></li>
               <li><hr class="dropdown-divider" style="border-color:var(--cream);"></li>
               <li><a class="dropdown-item cc-dd-simple" href="<?= SITE_URL ?>/pages/logout.php" style="color:#dc3545;"><i class="fas fa-sign-out-alt me-2" style="width:16px;"></i>Logout</a></li>
             </ul>
@@ -212,12 +214,39 @@ if ($user) {
   </div>
 </div>
 
-<?php if ($flash): ?>
+    <?php if ($flash): ?>
 <div class="px-3 pt-3">
   <div class="alert alert-<?= e($flash['type']) ?> alert-dismissible fade show cc-alert" role="alert">
     <i class="fas <?= $flash['type']==='success'?'fa-check-circle':'fa-triangle-exclamation' ?> me-2"></i>
-    <?= e($flash['msg']) ?>
+    <?= $flash['msg'] ?>
     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
   </div>
 </div>
+<?php endif; ?>
+
+<?php if ($user): ?>
+<script>
+// ── Live badge polling (runs on every page) ───────────────────
+(function () {
+  const API = '<?= SITE_URL ?>/pages/api_notifications.php';
+  function updateBadge(cls, count) {
+    document.querySelectorAll('.' + cls).forEach(el => {
+      if (count > 0) {
+        el.textContent = count > 9 ? '9+' : count;
+        el.style.display = '';
+      } else {
+        el.style.display = 'none';
+      }
+    });
+  }
+  function pollBadges() {
+    fetch(API).then(r => r.json()).then(d => {
+      updateBadge('cc-msg-badge',   d.unread_msgs   || 0);
+      updateBadge('cc-notif-badge', d.unread_notifs || 0);
+    }).catch(() => {});
+  }
+  // Poll every 30 seconds
+  setInterval(pollBadges, 30000);
+})();
+</script>
 <?php endif; ?>

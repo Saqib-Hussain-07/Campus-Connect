@@ -1,0 +1,28 @@
+# ── CampusConnect .gitignore ──────────────────────────────────
+
+# Dev email log (contains verification/reset links — never commit)
+mail_log.txt
+
+# Uploaded user files
+assets/uploads/avatars/*
+!assets/uploads/avatars/.htaccess
+!assets/uploads/avatars/.gitkeep
+
+# PHP/system files
+*.log
+*.bak
+*.swp
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Node (if using any build tools)
+node_modules/
+
+# Cloned dev tools (not part of the project)
+caveman/

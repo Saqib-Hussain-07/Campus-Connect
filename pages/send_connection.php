@@ -17,13 +17,34 @@ if ($toUser < 1 || $toUser === $me) {
 
 try {
     $db = getDB();
-    $st = $db->prepare('INSERT IGNORE INTO connections (from_user, to_user, status) VALUES (?,?,?)');
-    $st->execute([$me, $toUser, 'pending']);
-    setFlash('success', 'Connection request sent!');
+
+    // Check if a connection already exists in either direction
+    $chk = $db->prepare(
+        'SELECT status FROM connections
+         WHERE (from_user=? AND to_user=?) OR (from_user=? AND to_user=?)'
+    );
+    $chk->execute([$me, $toUser, $toUser, $me]);
+    $existing = $chk->fetch();
+
+    if ($existing) {
+        if ($existing['status'] === 'accepted') {
+            setFlash('info', 'You are already connected with this student.');
+        } else {
+            setFlash('info', 'A connection request is already pending.');
+        }
+    } else {
+        $st = $db->prepare('INSERT INTO connections (from_user, to_user, status) VALUES (?,?,?)');
+        $st->execute([$me, $toUser, 'pending']);
+        setFlash('success', 'Connection request sent!');
+    }
 } catch (Exception $e) {
-    setFlash('warning', 'Could not send request. You may have already sent one.');
+    setFlash('warning', 'Could not send request. Please try again.');
 }
 
-$ref = $_SERVER['HTTP_REFERER'] ?? SITE_URL.'/pages/students.php';
+// Validate referer to prevent open redirect
+$ref = $_SERVER['HTTP_REFERER'] ?? '';
+if (!$ref || strpos($ref, SITE_URL) !== 0) {
+    $ref = SITE_URL . '/pages/students.php';
+}
 header('Location: ' . $ref);
 exit;

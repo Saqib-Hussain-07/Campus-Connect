@@ -47,19 +47,12 @@
         </ul>
       </div>
 
-      <!-- Contact + newsletter -->
+      <!-- Contact -->
       <div class="col-lg-4 col-md-6">
         <div class="cc-footer-col-title">Get In Touch</div>
         <div class="cc-contact-item"><i class="fas fa-envelope"></i><span>hello@campusconnect.edu</span></div>
         <div class="cc-contact-item"><i class="fas fa-phone"></i><span>+91 98765 43210</span></div>
         <div class="cc-contact-item"><i class="fas fa-location-dot"></i><span>Mumbai, India</span></div>
-
-        <div class="cc-footer-col-title mt-4 mb-2">Newsletter</div>
-        <form method="POST" action="<?= SITE_URL ?>/pages/newsletter.php" class="d-flex gap-0">
-          <input type="hidden" name="csrf" value="<?= $_SESSION['csrf'] ?? '' ?>">
-          <input type="email" name="email" required placeholder="your@email.com" class="cc-newsletter-input flex-grow-1">
-          <button type="submit" class="cc-newsletter-btn"><i class="fas fa-paper-plane"></i></button>
-        </form>
       </div>
 
     </div>

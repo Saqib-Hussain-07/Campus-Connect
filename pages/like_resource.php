@@ -17,5 +17,9 @@ if ($ex->fetch()) {
     $db->prepare('INSERT IGNORE INTO resource_likes (resource_id,user_id) VALUES (?,?)')->execute([$resId,$me]);
     $db->prepare('UPDATE resources SET likes=likes+1 WHERE id=?')->execute([$resId]);
 }
-$redirect = urldecode($_POST['redirect'] ?? SITE_URL.'/pages/resources.php');
-header('Location: '.$redirect); exit;
+// Validate redirect URL to prevent open redirect vulnerability
+$redirect = urldecode($_POST['redirect'] ?? '');
+if (!$redirect || strpos($redirect, SITE_URL) !== 0) {
+    $redirect = SITE_URL . '/pages/resources.php';
+}
+header('Location: ' . $redirect); exit;

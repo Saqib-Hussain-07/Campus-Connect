@@ -3,9 +3,6 @@
 --  Run AFTER database.sql and database_update.sql
 --  Adds: email verification, password reset, login audit
 -- ============================================================
-
-USE campusconnect;
-
 -- ── Email verification tokens ─────────────────────────────────
 ALTER TABLE users
     ADD COLUMN IF NOT EXISTS verify_token   VARCHAR(64)  DEFAULT NULL,

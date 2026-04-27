@@ -1,6 +1,9 @@
 -- ============================================================
 --  CampusConnect Database Schema
 -- ============================================================
+Create campusconnect if not exit;
+USE campusconnect;
+
 -- ── Users ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
     id          INT AUTO_INCREMENT PRIMARY KEY,

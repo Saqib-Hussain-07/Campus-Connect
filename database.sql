@@ -1,10 +1,6 @@
 -- ============================================================
 --  CampusConnect Database Schema
 -- ============================================================
-
-CREATE DATABASE IF NOT EXISTS campusconnect;
-USE campusconnect;
-
 -- ── Users ────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS users (
     id          INT AUTO_INCREMENT PRIMARY KEY,
